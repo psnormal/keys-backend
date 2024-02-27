@@ -21,6 +21,7 @@ namespace KeyBooking_backend.Controllers
         }
 
         [HttpPost]
+        [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerUser)
         {
             var userExist = await _userManager.FindByEmailAsync(registerUser.Email);
@@ -38,6 +39,10 @@ namespace KeyBooking_backend.Controllers
             var result = await _userManager.CreateAsync(user, registerUser.Password);
             if (result.Succeeded)
             {
+                if (registerUser.Email == "admin@hits.ru")
+                {
+                    await _userManager.AddToRoleAsync(user, "Admin");
+                }
                 return StatusCode(StatusCodes.Status200OK);
             }
             else
@@ -45,5 +50,12 @@ namespace KeyBooking_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        /*[HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto login)
+        {
+
+        }*/
     }
 }

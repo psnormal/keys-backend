@@ -22,10 +22,10 @@ namespace KeyBooking_backend
         {
             builder.Entity<IdentityRole>().HasData
                 (
-                new IdentityRole() { Name = "Admin", ConcurrencyStamp = "1", NormalizedName = "Admin" },
-                new IdentityRole() { Name = "Deanery", ConcurrencyStamp = "2", NormalizedName = "Deanery" },
-                new IdentityRole() { Name = "Teacher", ConcurrencyStamp = "3", NormalizedName = "Teacher" },
-                new IdentityRole() { Name = "Student", ConcurrencyStamp = "4", NormalizedName = "Student" }
+                new IdentityRole() { Name = "Admin", ConcurrencyStamp = "1", NormalizedName = "ADMIN" },
+                new IdentityRole() { Name = "Deanery", ConcurrencyStamp = "2", NormalizedName = "DEANERY" },
+                new IdentityRole() { Name = "Teacher", ConcurrencyStamp = "3", NormalizedName = "TEACHER" },
+                new IdentityRole() { Name = "Student", ConcurrencyStamp = "4", NormalizedName = "STUDENT" }
                 );
         }
     }
