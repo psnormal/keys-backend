@@ -7,9 +7,9 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["keys-backend/KeyBooking_backend.csproj", "."]
+COPY ["KeyBooking_backend/KeyBooking_backend.csproj", "."]
 RUN dotnet restore "./KeyBooking_backend.csproj"
-COPY keys-backend .
+COPY KeyBooking_backend .
 WORKDIR "/src/."
 RUN dotnet build "KeyBooking_backend.csproj" -c Release -o /app/build
 
