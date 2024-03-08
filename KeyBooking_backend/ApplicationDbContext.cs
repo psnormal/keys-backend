@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using KeyBooking_backend.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Policy;
@@ -7,6 +8,11 @@ namespace KeyBooking_backend
 {
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
+        public DbSet<Application> Applications { get; set; }
+        public DbSet<ApplicationConstructor> ApplicationConstructors { get; set; }
+        public DbSet<Key> Keys { get; set; }
+        public DbSet<Period> Periods { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             Database.EnsureCreated();
