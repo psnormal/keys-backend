@@ -9,7 +9,7 @@ using System.Text;
 
 namespace KeyBooking_backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace KeyBooking_backend.Controllers
         }
 
         [HttpPost]
-        [Route("Register")]
+        [Route("auth/register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerUser)
         {
             var userExist = await _userManager.FindByEmailAsync(registerUser.Email);
@@ -56,7 +56,7 @@ namespace KeyBooking_backend.Controllers
         }
 
         [HttpPost]
-        [Route("Login")]
+        [Route("auth/login")]
         public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
             var user = await _userManager.FindByEmailAsync(login.Email);
