@@ -52,6 +52,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IKeyService, KeyService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //Adding Auth
 var configuration = builder.Configuration;
