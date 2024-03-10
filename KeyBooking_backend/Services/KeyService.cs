@@ -2,6 +2,7 @@
 using KeyBooking_backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace KeyBooking_backend.Services
 {
@@ -116,6 +117,56 @@ namespace KeyBooking_backend.Services
             {
                 throw new ValidationException("Something went wrong");
             }
+        }
+
+        public InfoKeyAvailabilityDto GetKeyAvailability(int number, DateTime date)
+        {
+            var infoKey = _context.Keys.FirstOrDefault(x => x.Number == number);
+
+            if (infoKey == null)
+            {
+                throw new ValidationException("This key does not exist");
+            }
+
+            var allPeriods = _context.Periods.ToList();
+            var allPeriods2 = new List<Period>();
+            var month = date.Month;
+            var day = date.Day;
+            var year = date.Year;
+            var applicationsToDateAndKey = _context.Applications.Where(x => x.KeyId == number && x.Date.Year == year && x.Date.Month == day && x.Date.Day == month).ToList();
+
+            /*foreach ( var application in applicationsToDateAndKey )
+            {
+                foreach (var per in allPeriods )
+                {
+                    if (per.Id != application.PeriodId)
+                        allPeriods2.Add(per);
+                }
+            }*/
+
+            foreach (var per in allPeriods)
+            {
+                foreach (var application in applicationsToDateAndKey)
+                {
+                    if (per.Id == application.PeriodId)
+                        allPeriods2.Add(per);
+                }
+            }
+
+            foreach (var per in allPeriods2)
+            {
+                allPeriods.Remove(per);
+            }
+
+            var result1 = new List<int>();
+            foreach (var item in allPeriods)
+            {
+                result1.Add(item.Id);
+            }
+
+            InfoKeyAvailabilityDto result = new InfoKeyAvailabilityDto(result1);
+
+            return result;
         }
     }
 }

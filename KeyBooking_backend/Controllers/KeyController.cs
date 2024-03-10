@@ -158,5 +158,28 @@ namespace KeyBooking_backend.Controllers
                 return StatusCode(500, "Something went wrong");
             }
         }
+
+        [HttpPost]
+        [Route("key/{number}/availability")]
+        public ActionResult<InfoKeyAvailabilityDto> GetKeyAvailability(int number, DateTime date)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return _keyService.GetKeyAvailability(number, date);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This key does not exist")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                return StatusCode(500, "Something went wrong");
+            }
+        }
     }
 }
