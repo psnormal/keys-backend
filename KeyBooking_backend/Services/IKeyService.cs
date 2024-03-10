@@ -11,5 +11,6 @@ namespace KeyBooking_backend.Services
         Task DeleteKey(int number);
         InfoKeysDto GetKeysUser(Guid UserId);
         Task TransferKey(Key model);
+        InfoKeyAvailabilityDto GetKeyAvailability(int number, DateTime date);
     }
 }
