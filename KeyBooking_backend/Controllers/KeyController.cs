@@ -1,7 +1,9 @@
 ﻿using KeyBooking_backend.Dto;
 using KeyBooking_backend.Models;
 using KeyBooking_backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace KeyBooking_backend.Controllers
 {
@@ -16,6 +18,7 @@ namespace KeyBooking_backend.Controllers
             _keyService = keyService;
         }
 
+        [Authorize(Roles = "Admin,Deanery")]
         [HttpPost]
         [Route("key/create")]
         public async Task<ActionResult<InfoKeyDto>> CreateKey(KeyCreateDto model)
