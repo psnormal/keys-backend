@@ -84,7 +84,8 @@ namespace KeyBooking_backend.Controllers
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-                    expiration = jwtToken.ValidTo
+                    expiration = jwtToken.ValidTo,
+                    user = user.Id
                 });
             }
             else
