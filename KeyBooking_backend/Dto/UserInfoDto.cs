@@ -10,5 +10,7 @@ namespace KeyBooking_backend.Dto
         public string UserName { get; set; }
         [Required]
         public string UserEmail { get; set; }
+        [Required]
+        public List<string> roles { get; set; }
     }
 }
