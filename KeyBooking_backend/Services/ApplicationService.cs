@@ -75,6 +75,7 @@ namespace KeyBooking_backend.Services
 
             ApplicationInfoDto result = new ApplicationInfoDto
             {
+                Id = application.Id,
                 Name = application.Name,
                 Description = application.Description,
                 Date = application.Date,
@@ -95,6 +96,7 @@ namespace KeyBooking_backend.Services
             {
                 ApplicationInfoDto applicationInfo = new ApplicationInfoDto
                 {
+                    Id = application.Id,
                     Name = application.Name,
                     Description = application.Description,
                     Date = application.Date,
