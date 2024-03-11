@@ -3,6 +3,7 @@ using KeyBooking_backend.Models;
 using Microsoft.AspNetCore.Identity;
 using System.CodeDom;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 
 namespace KeyBooking_backend.Services
 {
@@ -69,7 +70,7 @@ namespace KeyBooking_backend.Services
                 throw new ValidationException();
             }
 
-            if (application.State == ApplicationState.Approved || key.UserId == application.Owner)
+            if (application.State == ApplicationState.Approved && key.State == KeyState.OnHands && key.UserId == application.Owner)
             {
                 throw new ValidationException("You cannot reject the application for which the key was issued!");
             }
@@ -91,6 +92,18 @@ namespace KeyBooking_backend.Services
             if (user == null)
             {
                 throw new ValidationException("This user does not exist!");
+            }
+
+            var key = _dbContext.Keys.FirstOrDefault(x => x.Number == model.KeyId);
+            if (key == null)
+            {
+                throw new ValidationException("Key mentioned in application does not exist!");
+            }
+
+            var period = _dbContext.Periods.FirstOrDefault(x => x.Id == model.PeriodId);
+            if (period == null)
+            {
+                throw new ValidationException("Period mentioned in application does not exist!");
             }
 
             var sameApplication = _dbContext.Applications.FirstOrDefault(x =>
@@ -180,6 +193,41 @@ namespace KeyBooking_backend.Services
             return result;
         }
 
+        public async Task RecallApplication(string id, string userEmail)
+        {
+
+            var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id));
+
+            if (application == null)
+            {
+                throw new ValidationException("This application does not exist!");
+            }
+
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                throw new ValidationException();
+            }
+
+            if (application.Owner.ToString() != user.Id)
+            {
+                throw new ValidationException("The application you are trying to withdraw does not belong to you!");
+            }
+
+            var key =  _dbContext.Keys.FirstOrDefault(x => x.Number == application.KeyId);
+            if (key == null)
+            {
+                throw new ValidationException();
+            }
+
+            if (application.State == ApplicationState.Approved && key.State == KeyState.OnHands && key.UserId == application.Owner)
+            {
+                throw new ValidationException("You cannot recall the application for which the key was issued!");
+            }
+
+            _dbContext.Entry(application).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+
+            await _dbContext.SaveChangesAsync();
 
 
 
@@ -187,5 +235,7 @@ namespace KeyBooking_backend.Services
 
 
 
+
+        }
     }
 }
