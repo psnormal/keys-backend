@@ -11,14 +11,12 @@ namespace KeyBooking_backend.Controllers
     public class RoleController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
         private const string userDontExistMessage = "User with provided email don't exist!";
 
-        public RoleController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public RoleController(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
         [Authorize(Roles = "Admin,Deanery")]
