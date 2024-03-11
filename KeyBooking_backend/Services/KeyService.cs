@@ -119,7 +119,7 @@ namespace KeyBooking_backend.Services
             }
         }
 
-        public InfoKeyAvailabilityDto GetKeyAvailability(int number, DateTime date)
+        public InfoKeyAvailabilityDto GetKeyAvailability(int number, DateOnly date)
         {
             var infoKey = _context.Keys.FirstOrDefault(x => x.Number == number);
 
@@ -133,7 +133,7 @@ namespace KeyBooking_backend.Services
             var month = date.Month;
             var day = date.Day;
             var year = date.Year;
-            var applicationsToDateAndKey = _context.Applications.Where(x => x.KeyId == number && x.Date.Year == year && x.Date.Month == day && x.Date.Day == month).ToList();
+            var applicationsToDateAndKey = _context.Applications.Where(x => x.KeyId == number && x.Date == date).ToList();
 
             /*foreach ( var application in applicationsToDateAndKey )
             {

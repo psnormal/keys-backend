@@ -161,7 +161,7 @@ namespace KeyBooking_backend.Controllers
 
         [HttpPost]
         [Route("key/{number}/availability")]
-        public ActionResult<InfoKeyAvailabilityDto> GetKeyAvailability(int number, DateTime date)
+        public ActionResult<InfoKeyAvailabilityDto> GetKeyAvailability(int number, DateOnly date)
         {
             if (!ModelState.IsValid)
             {
