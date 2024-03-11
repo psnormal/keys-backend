@@ -110,6 +110,79 @@ namespace KeyBooking_backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Student,Teacher")]
+        [HttpGet]
+        [Route("myApplications")]
+        public async Task<ActionResult<ApplicationsListDto>> GetMyApplicationsInfo()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var currentUser = _httpContext.HttpContext.User;
+            string userEmail = "";
+            foreach (var i in currentUser.Claims)
+            {
+                if (i.Type == ClaimTypes.Email)
+                {
+                    userEmail = i.Value;
+                }
+            }
+
+            if (userEmail == "")
+            {
+                return BadRequest();
+            }
+
+
+            try
+            {
+                return await _applicationService.GetMyApplicationsInfo(userEmail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+        [Authorize(Roles = "Student,Teacher")]
+        [HttpGet]
+        [Route("myApplications/{id}")]
+        public async Task<ActionResult<ApplicationInfoDto>> GetMyApplicationInfo(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var currentUser = _httpContext.HttpContext.User;
+            string userEmail = "";
+            foreach (var i in currentUser.Claims)
+            {
+                if (i.Type == ClaimTypes.Email)
+                {
+                    userEmail = i.Value;
+                }
+            }
+
+            if (userEmail == "")
+            {
+                return BadRequest();
+            }
+
+
+            try
+            {
+                return await _applicationService.GetMyApplicationInfo(id, userEmail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+
         [Authorize(Roles = "Deanery")]
         [HttpPost]
         [Route("application/{id}/approve")]
@@ -163,5 +236,50 @@ namespace KeyBooking_backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Student,Teacher")]
+        [HttpDelete]
+        [Route("application/{id}/recall")]
+        public async Task<IActionResult> RecallApplication(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var currentUser = _httpContext.HttpContext.User;
+            string userEmail = "";
+            foreach (var i in currentUser.Claims)
+            {
+                if (i.Type == ClaimTypes.Email)
+                {
+                    userEmail = i.Value;
+                }
+            }
+
+            if (userEmail == "")
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _applicationService.RecallApplication(id, userEmail);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This application does not exist!" ||
+                    
+                    ex.Message == "You cannot recall the application for which the key was issued!")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                else if (ex.Message == "The application you are trying to withdraw does not belong to you!")
+                {
+                    return StatusCode(403, ex.Message);
+                }
+                return StatusCode(500, ex.Message); //"Something went wrong");
+            }
+        }
     }
 }

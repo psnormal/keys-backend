@@ -180,12 +180,105 @@ namespace KeyBooking_backend.Services
             return result;
         }
 
+        public async Task RecallApplication(string id, string userEmail)
+        {
+
+            var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id));
+
+            if (application == null)
+            {
+                throw new ValidationException("This application does not exist!");
+            }
+
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                throw new ValidationException();
+            }
+
+            if (application.Owner.ToString() != user.Id)
+            {
+                throw new ValidationException("The application you are trying to withdraw does not belong to you!");
+            }
+
+            var key = _dbContext.Keys.FirstOrDefault(x => x.Number == application.KeyId);
+            if (key == null)
+            {
+                throw new ValidationException();
+            }
+
+            if (application.State == ApplicationState.Approved && key.State == KeyState.OnHands && key.UserId == application.Owner)
+            {
+                throw new ValidationException("You cannot recall the application for which the key was issued!");
+            }
+
+            _dbContext.Entry(application).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+
+            await _dbContext.SaveChangesAsync();
+
+        }
 
 
 
+        public async Task<ApplicationsListDto> GetMyApplicationsInfo(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                throw new ValidationException();
+            }
 
+            var applications = _dbContext.Applications.Where(x => x.Owner.ToString() == user.Id).ToList();
+            var listedResult = new List<ApplicationInfoDto>();
+            foreach (var application in applications)
+            {
+                ApplicationInfoDto applicationInfo = new ApplicationInfoDto
+                {
+                    Id = application.Id,
+                    Name = application.Name,
+                    Description = application.Description,
+                    Date = application.Date,
+                    PeriodId = application.PeriodId,
+                    KeyId = application.KeyId,
+                    Owner = application.Owner,
+                    State = application.State,
+                    isRepeated = application.isRepeated
+                };
+                listedResult.Add(applicationInfo);
+            }
+            var result = new ApplicationsListDto(listedResult);
+            return result;
+        }
 
+        public async Task<ApplicationInfoDto> GetMyApplicationInfo(string id, string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                throw new ValidationException();
+            }
 
+            var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id) && x.Owner.ToString() == user.Id);
 
+            if (application == null)
+            {
+                throw new ValidationException("This application does not exist!");
+            }
+
+            ApplicationInfoDto result = new ApplicationInfoDto
+            {
+                Id = application.Id,
+                Name = application.Name,
+                Description = application.Description,
+                Date = application.Date,
+                PeriodId = application.PeriodId,
+                KeyId = application.KeyId,
+                Owner = application.Owner,
+                State = application.State,
+                isRepeated = application.isRepeated
+            };
+
+            return result;
+        }
     }
 }
