@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace KeyBooking_backend.Controllers
 {
-    [Route("api/application")]
+    [Route("api")]
     [ApiController]
     public class ApplicationController : ControllerBase
     {
@@ -110,6 +110,58 @@ namespace KeyBooking_backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Deanery")]
+        [HttpPost]
+        [Route("application/{id}/approve")]
+        public async Task<IActionResult> ApproveApplication(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _applicationService.ApproveApplication(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This application does not exist!" ||
+                    ex.Message == "You can approve only new applications!")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+        [Authorize(Roles = "Deanery")]
+        [HttpPost]
+        [Route("application/{id}/reject")]
+        public async Task<IActionResult> RejectApplication(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _applicationService.RejectApplication(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This application does not exist!" ||
+                    ex.Message == "You can approve only new applications!" ||
+                    ex.Message == "You cannot reject the application for which the key was issued!")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                return StatusCode(500, "Something went wrong");
+            }
+        }
 
     }
 }

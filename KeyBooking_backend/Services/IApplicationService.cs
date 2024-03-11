@@ -7,5 +7,7 @@ namespace KeyBooking_backend.Services
         Task CreateApplication(CreateApplicationDto model, string userEmail);
         ApplicationInfoDto GetApplicationInfo(string id);
         ApplicationsListDto GetApplicationsInfo();
+        Task ApproveApplication(string id);
+        Task RejectApplication(string id);
     }
 }
