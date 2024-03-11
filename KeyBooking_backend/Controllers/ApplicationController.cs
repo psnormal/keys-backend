@@ -22,8 +22,6 @@ namespace KeyBooking_backend.Controllers
             _applicationService = applicationService;
         }
 
-
-
         [Authorize(Roles = "Student,Teacher")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateApplication([FromBody] CreateApplicationDto applicationInfo)
@@ -57,7 +55,9 @@ namespace KeyBooking_backend.Controllers
             (Exception ex)
             {
                 if (ex.Message == "This time is already taken!" || 
-                    ex.Message == "You have already submitted a request for this time!")
+                    ex.Message == "You have already submitted a request for this time!" ||
+                    ex.Message == "Key mentioned in application does not exist!" ||
+                    ex.Message == "Period mentioned in application does not exist!")
                 {
                     return StatusCode(400, ex.Message);
                 }
@@ -154,7 +154,7 @@ namespace KeyBooking_backend.Controllers
             catch (Exception ex)
             {
                 if (ex.Message == "This application does not exist!" ||
-                    ex.Message == "You can approve only new applications!" ||
+                    ex.Message == "You can't reject already rejected applications!" ||
                     ex.Message == "You cannot reject the application for which the key was issued!")
                 {
                     return StatusCode(400, ex.Message);
@@ -163,5 +163,50 @@ namespace KeyBooking_backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Student,Teacher")]
+        [HttpDelete]
+        [Route("application/{id}/recall")]
+        public async Task<IActionResult> RecallApplication(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var currentUser = _httpContext.HttpContext.User;
+            string userEmail = "";
+            foreach (var i in currentUser.Claims)
+            {
+                if (i.Type == ClaimTypes.Email)
+                {
+                    userEmail = i.Value;
+                }
+            }
+
+            if (userEmail == "")
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _applicationService.RecallApplication(id, userEmail);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This application does not exist!" ||
+                    
+                    ex.Message == "You cannot recall the application for which the key was issued!")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                else if (ex.Message == "The application you are trying to withdraw does not belong to you!")
+                {
+                    return StatusCode(403, ex.Message);
+                }
+                return StatusCode(500, ex.Message); //"Something went wrong");
+            }
+        }
     }
 }

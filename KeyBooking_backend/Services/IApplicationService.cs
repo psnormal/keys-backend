@@ -9,5 +9,6 @@ namespace KeyBooking_backend.Services
         ApplicationsListDto GetApplicationsInfo();
         Task ApproveApplication(string id);
         Task RejectApplication(string id);
+        Task RecallApplication(string id, string userEmail);
     }
 }
