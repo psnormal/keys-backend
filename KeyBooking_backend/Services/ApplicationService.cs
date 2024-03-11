@@ -38,7 +38,8 @@ namespace KeyBooking_backend.Services
                 .Where(x => x.Date == application.Date)
                 .Where(x =>
                     x.PeriodId == application.PeriodId &&
-                    x.State == Models.ApplicationState.New);
+                    x.State == Models.ApplicationState.New)
+                .Where( x => x != application);
 
             if (sameApplications != null)
             {
@@ -79,12 +80,6 @@ namespace KeyBooking_backend.Services
 
             await _dbContext.SaveChangesAsync();
         }
-
-
-
-
-
-
 
         public async Task CreateApplication(CreateApplicationDto model, string userEmail)
         {
