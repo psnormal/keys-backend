@@ -110,6 +110,79 @@ namespace KeyBooking_backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Student,Teacher")]
+        [HttpGet]
+        [Route("myApplications")]
+        public async Task<ActionResult<ApplicationsListDto>> GetMyApplicationsInfo()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var currentUser = _httpContext.HttpContext.User;
+            string userEmail = "";
+            foreach (var i in currentUser.Claims)
+            {
+                if (i.Type == ClaimTypes.Email)
+                {
+                    userEmail = i.Value;
+                }
+            }
+
+            if (userEmail == "")
+            {
+                return BadRequest();
+            }
+
+
+            try
+            {
+                return await _applicationService.GetMyApplicationsInfo(userEmail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+        [Authorize(Roles = "Student,Teacher")]
+        [HttpGet]
+        [Route("myApplications/{id}")]
+        public async Task<ActionResult<ApplicationInfoDto>> GetMyApplicationInfo(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var currentUser = _httpContext.HttpContext.User;
+            string userEmail = "";
+            foreach (var i in currentUser.Claims)
+            {
+                if (i.Type == ClaimTypes.Email)
+                {
+                    userEmail = i.Value;
+                }
+            }
+
+            if (userEmail == "")
+            {
+                return BadRequest();
+            }
+
+
+            try
+            {
+                return await _applicationService.GetMyApplicationInfo(id, userEmail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+
         [Authorize(Roles = "Deanery")]
         [HttpPost]
         [Route("application/{id}/approve")]
