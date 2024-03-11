@@ -22,8 +22,6 @@ namespace KeyBooking_backend.Controllers
             _applicationService = applicationService;
         }
 
-
-
         [Authorize(Roles = "Student,Teacher")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateApplication([FromBody] CreateApplicationDto applicationInfo)
@@ -57,7 +55,9 @@ namespace KeyBooking_backend.Controllers
             (Exception ex)
             {
                 if (ex.Message == "This time is already taken!" || 
-                    ex.Message == "You have already submitted a request for this time!")
+                    ex.Message == "You have already submitted a request for this time!" ||
+                    ex.Message == "Key mentioned in application does not exist!" ||
+                    ex.Message == "Period mentioned in application does not exist!")
                 {
                     return StatusCode(400, ex.Message);
                 }
@@ -227,7 +227,7 @@ namespace KeyBooking_backend.Controllers
             catch (Exception ex)
             {
                 if (ex.Message == "This application does not exist!" ||
-                    ex.Message == "You can approve only new applications!" ||
+                    ex.Message == "You can't reject already rejected applications!" ||
                     ex.Message == "You cannot reject the application for which the key was issued!")
                 {
                     return StatusCode(400, ex.Message);

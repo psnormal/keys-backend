@@ -3,6 +3,7 @@ using KeyBooking_backend.Models;
 using Microsoft.AspNetCore.Identity;
 using System.CodeDom;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 
 namespace KeyBooking_backend.Services
 {
@@ -69,7 +70,7 @@ namespace KeyBooking_backend.Services
                 throw new ValidationException();
             }
 
-            if (application.State == ApplicationState.Approved || key.UserId == application.Owner)
+            if (application.State == ApplicationState.Approved && key.State == KeyState.OnHands && key.UserId == application.Owner)
             {
                 throw new ValidationException("You cannot reject the application for which the key was issued!");
             }
@@ -91,6 +92,18 @@ namespace KeyBooking_backend.Services
             if (user == null)
             {
                 throw new ValidationException("This user does not exist!");
+            }
+
+            var key = _dbContext.Keys.FirstOrDefault(x => x.Number == model.KeyId);
+            if (key == null)
+            {
+                throw new ValidationException("Key mentioned in application does not exist!");
+            }
+
+            var period = _dbContext.Periods.FirstOrDefault(x => x.Id == model.PeriodId);
+            if (period == null)
+            {
+                throw new ValidationException("Period mentioned in application does not exist!");
             }
 
             var sameApplication = _dbContext.Applications.FirstOrDefault(x =>
@@ -183,6 +196,7 @@ namespace KeyBooking_backend.Services
         public async Task RecallApplication(string id, string userEmail)
         {
 
+
             var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id));
 
             if (application == null)
@@ -214,11 +228,10 @@ namespace KeyBooking_backend.Services
 
             _dbContext.Entry(application).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
 
+
             await _dbContext.SaveChangesAsync();
 
         }
-
-
 
         public async Task<ApplicationsListDto> GetMyApplicationsInfo(string userEmail)
         {
@@ -279,6 +292,7 @@ namespace KeyBooking_backend.Services
             };
 
             return result;
+
         }
     }
 }
