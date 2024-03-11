@@ -25,9 +25,9 @@ namespace KeyBooking_backend.Services
                 throw new ValidationException("This user does not exist");
             }
 
-            var sameApplication = _dbContext.Applications.FirstOrDefault(x => 
-            x.Date == model.Date && 
-            x.PeriodId == model.PeriodId && 
+            var sameApplication = _dbContext.Applications.FirstOrDefault(x =>
+            x.Date == model.Date &&
+            x.PeriodId == model.PeriodId &&
             x.State == Models.ApplicationState.Approved);
 
             if (sameApplication != null)
@@ -61,6 +61,53 @@ namespace KeyBooking_backend.Services
             await _dbContext.Applications.AddAsync(newApplication);
             await _dbContext.SaveChangesAsync();
 
+        }
+
+        public ApplicationInfoDto GetApplicationInfo(string id)
+        {
+
+            var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id));
+
+            if (application == null)
+            {
+                throw new ValidationException("This application does not exist");
+            }
+
+            ApplicationInfoDto result = new ApplicationInfoDto
+            {
+                Name = application.Name,
+                Description = application.Description,
+                Date = application.Date,
+                PeriodId = application.PeriodId,
+                KeyId = application.KeyId,
+                Owner = application.Owner,
+                State = application.State,
+                isRepeated = application.isRepeated
+            };
+            return result;
+        }
+
+        public ApplicationsListDto GetApplicationsInfo()
+        {
+            var applications = _dbContext.Applications.ToList();
+            var listedResult = new List<ApplicationInfoDto>();
+            foreach (var application in applications)
+            {
+                ApplicationInfoDto applicationInfo = new ApplicationInfoDto
+                {
+                    Name = application.Name,
+                    Description = application.Description,
+                    Date = application.Date,
+                    PeriodId = application.PeriodId,
+                    KeyId = application.KeyId,
+                    Owner = application.Owner,
+                    State = application.State,
+                    isRepeated = application.isRepeated
+                };
+                listedResult.Add(applicationInfo);
+            }
+            var result = new ApplicationsListDto(listedResult);
+            return result;
         }
     }
 }

@@ -66,9 +66,49 @@ namespace KeyBooking_backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Deanery")]
+        [HttpGet]
+        [Route("application/{id}")]
+        public ActionResult<ApplicationInfoDto> GetApplicationInfo(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
+            try
+            {
+                return _applicationService.GetApplicationInfo(id);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This application does not exist!")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                return StatusCode(500, "Something went wrong");
+            }
+        }
 
+        [Authorize(Roles = "Deanery")]
+        [HttpGet]
+        [Route("applications")]
+        public ActionResult<ApplicationsListDto> GetApplicationsInfo()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
+            try
+            {
+                return _applicationService.GetApplicationsInfo();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Something went wrong");
+            }
+        }
 
 
     }

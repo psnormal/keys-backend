@@ -21,7 +21,8 @@ namespace KeyBooking_backend.Dto
         public Guid Owner { get; set; }
         [Required]
         public ApplicationState State { get; set; }
-
+        [Required]
+        public bool isRepeated { get; set; }
 
 
     }
