@@ -17,12 +17,80 @@ namespace KeyBooking_backend.Services
             _dbContext = dbContext;
         }
 
+        public async Task ApproveApplication(string id)
+        {
+            var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id));
+
+            if (application == null)
+            {
+                throw new ValidationException("This application does not exist!");
+            }
+            if (application.State != ApplicationState.New)
+            {
+                throw new ValidationException("You can approve only new applications!");
+            }
+
+            application.State = ApplicationState.Approved;
+
+
+            var sameApplications = _dbContext.Applications
+                .Where(x => x.Date == application.Date)
+                .Where(x =>
+                    x.PeriodId == application.PeriodId &&
+                    x.State == Models.ApplicationState.New);
+
+            if (sameApplications != null)
+            {
+                foreach (var sameApplication in sameApplications)
+                {
+                    sameApplication.State = ApplicationState.Rejected;
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RejectApplication(string id)
+        {
+            var application = _dbContext.Applications.FirstOrDefault(x => x.Id == int.Parse(id));
+
+            if (application == null)
+            {
+                throw new ValidationException("This application does not exist!");
+            }
+            if (application.State == ApplicationState.Rejected)
+            {
+                throw new ValidationException("You can't reject already rejected applications!");
+            }
+
+            var key = _dbContext.Keys.FirstOrDefault(x => x.Number == application.KeyId);
+
+            if (key == null)
+            {
+                throw new ValidationException();
+            }
+
+            if (application.State == ApplicationState.Approved || key.UserId == application.Owner)
+            {
+                throw new ValidationException("You cannot reject the application for which the key was issued!");
+            }
+
+            application.State = ApplicationState.Rejected;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+
+
+
+
+
+
         public async Task CreateApplication(CreateApplicationDto model, string userEmail)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                throw new ValidationException("This user does not exist");
+                throw new ValidationException("This user does not exist!");
             }
 
             var sameApplication = _dbContext.Applications.FirstOrDefault(x =>
@@ -70,7 +138,7 @@ namespace KeyBooking_backend.Services
 
             if (application == null)
             {
-                throw new ValidationException("This application does not exist");
+                throw new ValidationException("This application does not exist!");
             }
 
             ApplicationInfoDto result = new ApplicationInfoDto
@@ -111,5 +179,13 @@ namespace KeyBooking_backend.Services
             var result = new ApplicationsListDto(listedResult);
             return result;
         }
+
+
+
+
+
+
+
+
     }
 }
