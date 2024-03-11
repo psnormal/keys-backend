@@ -7,6 +7,8 @@ namespace KeyBooking_backend.Dto
     public class ApplicationInfoDto
     {
         [Required]
+        public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
         public string Description { get; set; }
         [Required]
@@ -21,7 +23,8 @@ namespace KeyBooking_backend.Dto
         public Guid Owner { get; set; }
         [Required]
         public ApplicationState State { get; set; }
-
+        [Required]
+        public bool isRepeated { get; set; }
 
 
     }
