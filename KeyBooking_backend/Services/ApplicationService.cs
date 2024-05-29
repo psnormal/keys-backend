@@ -45,7 +45,7 @@ namespace KeyBooking_backend.Services
             {
                 foreach (var sameApplication in sameApplications)
                 {
-                    sameApplication.State = ApplicationState.Rejected;
+                    sameApplication.State = ApplicationState.Approved;
                 }
             }
             await _dbContext.SaveChangesAsync();
